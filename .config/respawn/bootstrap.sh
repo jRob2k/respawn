@@ -4,7 +4,7 @@
 # Syncs dotfiles via git.
 # Sets up "respawn" to manage packages via salt!!!!
 
-RESPAWN_DIRECTORY='~/.config/respawn'
+RESPAWN_DIRECTORY=$HOME/.config/respawn
 
 # Checking for and installing....
 # Homebrew (macOS only)...
@@ -29,30 +29,35 @@ if [[ ! -n "which git" ]]; then
     if [[ $OSTYPE = darwin* ]]; then
         brew install git
     elif [[ $OSTYPE = linux-gnu ]]; then
-        sudo apt update && sudo apt install git
+        sudo apt update && apt install git
     fi
 else
-    echo "Git is already  installed!"
+    echo "Git is already installed!"
 fi
 
 # GPG...
 echo "Checking for GPG..."
 if [[ ! -e "$(which gpg)" ]]; then
+    echo "GPG not detected..."
+    echo "Installing GPG..."	
     if [[ $OSTYPE = darwin* ]]; then
         $BREW/brew install gpg
     elif [[ $OSTYPE = linux-gnu* ]]; then
         sudo apt update
         sudo apt install gpg
     fi
+else
+    echo "GPG already installed!"
+
 fi
- 
+
 # 'Git-ing' my config files!!!!
-echo "Checking for .git at ~/"
+echo "Checking for .git in $HOME"
 if [[ ! -d ~/.git ]]; then
     echo "No git file in the home directory."
     echo "'Git-ing' my config files... hehe..."
     echo "..... gotta write this part...."
-elif $0 is '-git'; then
+elif [[ $1 == '-git' ]]; then
     echo "Overwriting configs since you used the '-git' flag"
     echo "'Git-ing' my config files... hehe..."
     echo "..... gotta write this part...."
@@ -74,5 +79,7 @@ else
 fi
 
 # Create/update minion config that points to this dir.
-#sed "s|{{ $RESPAWN_DIRECTORY }}|$RESPAWN_DIRECTORY|" minion_template > $RESPAWN_DIRECTORY/minion
+echo "Updating the minion config to point to $RESPAWN_DIRECTORY"
+echo $RESPAWN_DIRECTORY/minion
+sed "s|{{ $RESPAWN_DIRECTORY }}|$RESPAWN_DIRECTORY|" $RESPAWN_DIRECTORY/minion_template > $RESPAWN_DIRECTORY/minion
    
