@@ -4,14 +4,14 @@ file_client: local
 
 file_roots:
   base:
-    - {{ PWD }}
+    - "{{ PWD }}"
 
 pillar_roots:
   base:
-    - {{ PWD }}/pillars
+    - "{{ PWD }}/pillars"
 
 #module_dirs:
-#  - {{ PWD }}/_modules
+#  - "{{ PWD }}/_modules"
 
 multiprocessing: False
 

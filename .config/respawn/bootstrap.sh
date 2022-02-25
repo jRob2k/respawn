@@ -11,7 +11,7 @@ BREW=`which brew`
 # Homebrew (macOS only)...
 if [[ $OSTYPE = darwin* ]]; then
     echo "Checking for Homebrew"
-    if [[ ! -n "which brew" ]]; then
+    if [[ ! -n 'which brew' ]]; then
         echo "Homebrew not detected"
 	echo "Installing Homebrew"
 	echo "---- "
@@ -23,7 +23,7 @@ fi
 
 # Git...
 echo "Checking for Git..."
-if [[ ! -n "which git" ]]; then
+if [[ ! -n 'which git' ]]; then
     echo "Git not detected..."
     echo "Installing Git..."
     echo "---- "
@@ -74,7 +74,7 @@ fi
 
 # Salt...
 echo "Checking for SALT..."
-if [[ ! -n "which salt" ]]; then
+if [[ ! -n 'which salt' ]]; then
     echo "Salt not detected at '/etc/salt'"
     echo "Installing Salt..."
     echo "---- "

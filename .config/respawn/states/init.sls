@@ -1,6 +1,7 @@
 include:
   - .fish
   - .oh_my_fish
+  - .vundle
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock
