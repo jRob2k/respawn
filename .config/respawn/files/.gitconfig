@@ -1,0 +1,36 @@
+[user]
+	name = Shea Craig
+	email = sheagcraig@gmail.com
+	signingkey = 74001D71157199F1
+[core]
+	editor = /usr/bin/vim
+	excludesfile = ~/.gitignore_global
+[color]
+	ui = auto
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+[push]
+	default = simple
+[credential]
+	helper = osxkeychain
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	gpgsign = true
+[init]
+	defaultBranch = main

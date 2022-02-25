@@ -1,0 +1,8 @@
+.DS_Store
+.DS_Store?
+*.netrwhist
+*.pyc
+*.ropeproject
+*.swp
+.vscode
+venv
