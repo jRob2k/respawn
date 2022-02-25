@@ -18,7 +18,7 @@ This repo is how I manage my config files and basic packages on the *nix systems
 # Bootstrap
 This script will install some packages and config files and setcha up to run `respawn`.
 ```
-cd ~/ && curl -o /tmp/bootstrap-respawn.sh -L "https://raw.githubusercontent.com/jRob2k/respawn/main/.config/respawn/bootstrap.sh" && sudo sh /tmp/bootstrap-respawn.sh
+cd ~/ && curl -o /tmp/bootstrap-respawn.sh -L "https://raw.githubusercontent.com/jRob2k/respawn/main/.config/respawn/bootstrap.sh" && sudo bash /tmp/bootstrap-respawn.sh
 ```
 # Using Respawn
 Respawn is just git and salt. After installing with the bootstrap script, the following commands will work. 
