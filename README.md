@@ -22,9 +22,7 @@ cd ~/ && curl -o /tmp/bootstrap-respawn.sh -L "https://raw.githubusercontent.com
 ```
 # Using Respawn
 Respawn is just git and salt. After installing with the bootstrap script, the following commands will work. 
-
-Force git to overwrite respawn installation
-`respawn -f`
+TODO: Add functionality
 
 # Credits
 Inspiration drawn from...
