@@ -13,7 +13,7 @@
 ~~~~~~~~~~~~~~~These are my config files. There are many like them, but these are mine~~~~~~~~~~~
 ```
 # Overview
-This repo is how I manage my config files and basic packages on the *nix systems I use. You're welcome future me!
+This repo is how I manage my config files and basic packages on the *nix systems I use. You're welcome, future me!
 
 # Bootstrap
 This script will install some packages and config files and setcha up to run `respawn`.
@@ -22,6 +22,7 @@ cd ~/ && curl -o /tmp/bootstrap-respawn.sh -L "https://raw.githubusercontent.com
 ```
 # Using Respawn
 Respawn is just git and salt. After installing with the bootstrap script, the following commands will work. 
+
 TODO: Add functionality
 
 # Credits
