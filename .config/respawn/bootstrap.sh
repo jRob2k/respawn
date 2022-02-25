@@ -5,6 +5,7 @@
 # Sets up "respawn" to manage packages via salt!!!!
 
 RESPAWN_DIRECTORY=$HOME/.config/respawn
+BREW=`which brew`
 
 # Checking for and installing....
 # Homebrew (macOS only)...
@@ -27,7 +28,7 @@ if [[ ! -n "which git" ]]; then
     echo "Installing Git..."
     echo "---- "
     if [[ $OSTYPE = darwin* ]]; then
-        brew install git
+        $BREW install git
     elif [[ $OSTYPE = linux-gnu ]]; then
         sudo apt update && apt install git
     fi
@@ -41,7 +42,7 @@ if [[ ! -e "$(which gpg)" ]]; then
     echo "GPG not detected..."
     echo "Installing GPG..."	
     if [[ $OSTYPE = darwin* ]]; then
-        $BREW/brew install gpg
+        $BREW install gpg
     elif [[ $OSTYPE = linux-gnu* ]]; then
         sudo apt update
         sudo apt install gpg
@@ -53,14 +54,18 @@ fi
 
 # 'Git-ing' my config files!!!!
 echo "Checking for .git in $HOME"
+if [[ $1 == '-git' ]]; then
+    echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
+fi
 if [[ ! -d ~/.git ]]; then
     echo "No git file in the home directory."
     echo "'Git-ing' my config files... hehe..."
-    echo "..... gotta write this part...."
-elif [[ $1 == '-git' ]]; then
-    echo "Overwriting configs since you used the '-git' flag"
-    echo "'Git-ing' my config files... hehe..."
-    echo "..... gotta write this part...."
+    cd ~/
+    git init
+    git remote add origin git@github.com:jRob2k/respawn
+    git fetch
+    git checkout -f main
+    echo "Got my config files!!!"
 else
     echo "The home directory already has a git file."
     echo "Use git to fetch config files if they need to be updated"
@@ -82,4 +87,3 @@ fi
 echo "Updating the minion config to point to $RESPAWN_DIRECTORY"
 echo $RESPAWN_DIRECTORY/minion
 sed "s|{{ $RESPAWN_DIRECTORY }}|$RESPAWN_DIRECTORY|" $RESPAWN_DIRECTORY/minion_template > $RESPAWN_DIRECTORY/minion
-   
