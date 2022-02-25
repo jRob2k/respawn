@@ -10,7 +10,7 @@ RESPAWN_DIRECTORY=$HOME/.config/respawn
 # Homebrew (macOS only)...
 if [[ $OSTYPE = darwin* ]]; then
     echo "Checking for Homebrew"
-    if [[ ! -d $BREW ]]; then
+    if [[ ! -n "which brew" ]]; then
         echo "Homebrew not detected"
 	echo "Installing Homebrew"
 	echo "---- "
