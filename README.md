@@ -25,3 +25,9 @@ Respawn is just git and salt. After installing with the bootstrap script, the fo
 
 Force git to overwrite respawn installation
 `respawn -f`
+
+# Credits
+Inspiration drawn from...
+- https://github.com/sheagcraig/dotfiles
+- https://git.sr.ht/~sircmpwn/dotfiles
+    - https://drewdevault.com/2019/12/30/dotfiles.html
