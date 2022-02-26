@@ -1,6 +1,6 @@
 Install oh-my-fish:
   cmd.script:
-    - source: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install.sh
+    - name: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install
     - shell: /bin/fish
     - runas: {{ pillar['user'] }}
     - creates: {{ pillar['home'] }}/.oh-my-fish

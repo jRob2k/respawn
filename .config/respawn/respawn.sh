@@ -6,13 +6,13 @@ function help() {
     if [[ $OSTYPE = linux-gnu* ]]; then
         echo "---- "
         echo "-h | --help (This help menu!!!)"
-        echo "go (run the Salt high state)"
-        echo "-s <state> (runs one state instead of the entire highstate)"
+        echo "-g | --go (run the Salt high state)"
+        echo "-s | --salt <state> (runs one state instead of the entire highstate)"
     elif [[ $OSTYPE = darwin* ]]; then
         echo "---- "
         echo "-h | --help (This help menu!!!)"
-        echo "go (run the Salt high state)"
-        echo "-s <state> (runs one state instead of the entire highstate)"
+        echo "-g | --go (run the Salt high state)"
+        echo "-s | --salt <state> (runs one state instead of the entire highstate)"
     fi
 }
 
@@ -33,13 +33,13 @@ case "$1" in
     ;;
 
     #Salt states
-    "-s")
+    "-s" | "--salt")
     state=$2
     sc
         ;;
 
     #Salt highstate
-    "go")
+    "-g" | "--go")
     state=""
     sc
 
@@ -48,8 +48,9 @@ case "$1" in
             /bin/fish
         fi
         ;;
-    *)
 
+    #Launch help
+    *)
     help
     ;;
 esac

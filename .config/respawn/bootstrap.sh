@@ -86,4 +86,4 @@ fi
 # Create/update minion config that points to this dir.
 echo "Updating the minion config to point to $RESPAWN_DIRECTORY"
 echo $RESPAWN_DIRECTORY/minion
-sed "s|{{ $RESPAWN_DIRECTORY }}|$RESPAWN_DIRECTORY|" $RESPAWN_DIRECTORY/minion_template > $RESPAWN_DIRECTORY/minion
+sed "s|{{ PWD }}|$RESPAWN_DIRECTORY|" $RESPAWN_DIRECTORY/minion_template > $RESPAWN_DIRECTORY/minion
