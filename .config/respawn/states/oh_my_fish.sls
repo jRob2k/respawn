@@ -1,9 +1,13 @@
+Download oh-my-fish:
+  git.cloned:
+    - target: https://github.com/oh-my-fish/oh-my-fish
+    - creates: {{ pillar['home'] }}/.config/.oh-my-fish
+
 Install oh-my-fish:
-  cmd.script:
-    - name: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install
-    - shell: /bin/fish
-    - runas: {{ pillar['user'] }}
-    - creates: {{ pillar['home'] }}/.oh-my-fish
+  cmd.run:
+    - name: cd oh-my-fish && bin/install --offline
+    - onchanges:
+      - cmd: Download oh-my-fish
 
 Install agnoster theme:
   cmd.run:

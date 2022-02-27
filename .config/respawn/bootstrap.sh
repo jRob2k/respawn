@@ -4,8 +4,18 @@
 # Syncs dotfiles via git.
 # Sets up "respawn" to manage packages via salt!!!!
 
+BOOTSTRAP_INDICATOR=$HOME/.github/.respawn_bootstrap
 RESPAWN_DIRECTORY=$HOME/.config/respawn
 BREW=`which brew`
+
+#Checking if the script has been run before
+if [[ -e $BOOTSTRAP_INDICATOR ]]; then
+    echo "Bootstrap has run for this user before...."
+    echo "delete '~/.github/.respawn_bootstrap' to run again"
+    echo "Exiting..."
+    exit 0
+fi
+
 
 # Checking for and installing....
 # Homebrew (macOS only)...
@@ -22,6 +32,7 @@ if [[ $OSTYPE = darwin* ]]; then
 fi
 
 # Git...
+echo "---- "
 echo "Checking for Git..."
 if [[ ! -n 'which git' ]]; then
     echo "Git not detected..."
@@ -37,6 +48,7 @@ else
 fi
 
 # GPG...
+echo "---- "
 echo "Checking for GPG..."
 if [[ ! -e "$(which gpg)" ]]; then
     echo "GPG not detected..."
@@ -53,6 +65,7 @@ else
 fi
 
 # 'Git-ing' my config files!!!!
+echo "---- "
 echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then
     echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
@@ -73,6 +86,7 @@ else
 fi
 
 # Salt...
+echo "---- "
 echo "Checking for SALT..."
 if [[ ! -n 'which salt' ]]; then
     echo "Salt not detected at '/etc/salt'"
@@ -84,6 +98,23 @@ else
 fi
 
 # Create/update minion config that points to this dir.
+echo "---- "
 echo "Updating the minion config to point to $RESPAWN_DIRECTORY"
 echo $RESPAWN_DIRECTORY/minion
 sed "s|{{ PWD }}|$RESPAWN_DIRECTORY|" $RESPAWN_DIRECTORY/minion_template > $RESPAWN_DIRECTORY/minion
+
+# Run respawn salt highstate
+echo "---- "
+echo "Running Respawn Salt Highstate..."
+echo "Hold on to your butts..."
+cd ~/.config/respawn
+chmod +x respawn.sh
+/bin/bash respawn.sh -go 
+
+# Touching a file so bootstrap knows it's been run
+echo "---- "
+echo "Creating bootstrap indicator --> $BOOTSTRAP_INDICATOR"
+printf -v date '%(%Y-%m-%d %H:%M:%S)T\n' -1 
+echo "respawn bootstrap ran on $date" > $BOOTSTRAP_INDICATOR 
+
+
