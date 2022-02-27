@@ -1,4 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+#Setting variables
+RESPAWN_DIR=$HOME/.config/respawn
+
 #Presenting a platform specific help menu
 function help() {
     echo "~~~~ $OSTYPE ~~~~"
@@ -13,9 +17,9 @@ function help() {
 SALT=$(which salt-call)
 function sc() {
     sudo "$SALT" \
-        --config-dir="${PWD}" \
-        $salt_command $state \
-        pillar="{'user': '$USER', 'home': '$HOME', 'secrets_dir': '$PWD/secrets'}" 
+        --config-dir="${RESPAWN_DIR}" \
+        $salt_command $state $flag_1 $option_1 \
+        pillar="{'user': '$USER', 'home': '$HOME', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
 }
 
 
@@ -29,6 +33,8 @@ case "$1" in
     "-s" | "--salt")
     salt_command="state.apply"
     state=$2
+    flag_1=$3
+    option_1=$4
     sc
     ;;
 

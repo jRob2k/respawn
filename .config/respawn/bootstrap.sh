@@ -108,8 +108,8 @@ echo "---- "
 echo "Running Respawn Salt Highstate..."
 echo "Hold on to your butts..."
 cd ~/.config/respawn
-chmod +x respawn.sh
-/bin/bash respawn.sh -go 
+chmod +x respawn
+/bin/bash respawn -go 
 
 # Touching a file so bootstrap knows it's been run
 echo "---- "
