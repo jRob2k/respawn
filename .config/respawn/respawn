@@ -1,8 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #Setting variables
 RESPAWN_DIR=$HOME/.config/respawn
+FISH=$(which fish)
+SALT=$(which salt-call)
 
+    
 #Presenting a platform specific help menu
 function help() {
     echo "~~~~ $OSTYPE ~~~~"
@@ -16,10 +19,23 @@ function help() {
 # Finding salt installation and setting variable
 SALT=$(which salt-call)
 function sc() {
+    # Temporarily changing default shell so that salt calls in respawn will work. 
+    # TODO: This isn't quite working. Somewhere the space between shell and user is getting removed so it's trying to change to $shell$user instead of just $shell
+    # TODO: Figure out why it doesn't work with fish shell and fix
+    
+    # ORIGINALSHELL=$SHELL
+    # if [[ $SHELL == $FISH ]]; then
+    #         sudo chsh -s $(which bash) $USER
+    # fi
     sudo "$SALT" \
         --config-dir="${RESPAWN_DIR}" \
         $salt_command $state $flag_1 $option_1 \
         pillar="{'user': '$USER', 'home': '$HOME', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
+
+    # Change default shell back to FISH if it was FISH
+    # if [[ $ORIGINALSHELL != $SHELL ]]; then
+    #     sudo chsh -s $ORIGINALSHELL $USER
+    # fi
 }
 
 
@@ -45,8 +61,9 @@ case "$1" in
     sc
 
         # Launch fish if it's not already the shell.
-        if [[ $(echo $SHELL) != '/bin/fish' ]]; then
-            /bin/fish
+	# TODO: Should i change this to just be "prefered shell" or something instead of hardcoding fish?
+        if [[ $(echo $SHELL) != $FISH ]]; then
+            $FISH
         fi
         ;;
 
