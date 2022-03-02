@@ -1,5 +1,5 @@
 include:
-  - .vundle
+  - .spacevim
   - .fish
   - .oh_my_fish
   {% if grains['os'] == 'MacOS' %}
