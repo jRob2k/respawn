@@ -3,6 +3,8 @@
 #Setting variables
 RESPAWN_DIR=$HOME/.config/respawn
 FISH=$(which fish)
+BASH=$(which bash)
+ZSH=$(which zsh)
 SALT=$(which salt-call)
 
     
@@ -30,7 +32,7 @@ function sc() {
     sudo "$SALT" \
         --config-dir="${RESPAWN_DIR}" \
         $salt_command $state $flag_1 $option_1 \
-        pillar="{'user': '$USER', 'home': '$HOME', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
+        pillar="{'user': '$USER', 'home': '$HOME', 'fish': '$FISH', 'bash': '$BASH', 'zsh': '$ZSH', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
 
     # Change default shell back to FISH if it was FISH
     # if [[ $ORIGINALSHELL != $SHELL ]]; then
