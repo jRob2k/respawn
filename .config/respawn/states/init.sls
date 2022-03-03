@@ -9,4 +9,5 @@ include:
   - .dock
   {% elif grains['os_family'] == 'Debian' %}
   - .gnome_keyring
+  - .python3
   {% endif %}
