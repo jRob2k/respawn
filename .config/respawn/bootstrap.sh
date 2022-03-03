@@ -88,7 +88,7 @@ fi
 # Salt...
 echo "---- "
 echo "Checking for SALT..."
-if [[ ! -n 'which salt' ]]; then
+if [[ ! -e 'which salt' ]]; then
     echo "Salt not detected at '/etc/salt'"
     echo "Installing Salt..."
     echo "---- "

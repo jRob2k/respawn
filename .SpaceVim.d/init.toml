@@ -11,7 +11,7 @@
     # set spacevim theme. by default colorscheme layer is not loaded,
     # if you want to use more colorscheme, please load the colorscheme
     # layer
-    colorscheme = "gruvbox"
+    colorscheme = "nord"
     colorscheme_bg = "dark"
     # Disable guicolors in basic mode, many terminal do not support 24bit
     # true colors
@@ -26,18 +26,22 @@
 
 # Enable autocomplete layer
 [[layers]]
-name = 'autocomplete'
-auto_completion_return_key_behavior = "complete"
-auto_completion_tab_key_behavior = "smart"
+  name = 'autocomplete'
+  auto_completion_return_key_behavior = "complete"
+  auto_completion_tab_key_behavior = "smart"
+
+[[custom_plugins]]
+  repo = "arcticicestudio/nord-vim"
+  merged = 0
 
 [[layers]]
-name = 'shell'
-default_position = 'bottom'
-default_height = 30
+  name = 'shell'
+  default_position = 'bottom'
+  default_height = 30
 
 [[layers]]
-name = "checkers"
-lint_on_the_fly = true
+  name = "checkers"
+  lint_on_the_fly = true
 
 [[layers]]
-name = "lang#python"
+  name = "lang#python"
