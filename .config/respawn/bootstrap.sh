@@ -16,19 +16,36 @@ if [[ -e $BOOTSTRAP_INDICATOR ]]; then
     exit 0
 fi
 
-
 # Checking for and installing....
-# Homebrew (macOS only)...
-if [[ $OSTYPE = darwin* ]]; then
-    echo "Checking for Homebrew"
-    if [[ ! -n 'which brew' ]]; then
-        echo "Homebrew not detected"
+# Homebrew...
+echo "Checking for Homebrew"
+if [[ ! -n 'which brew' ]]; then
+  echo "Homebrew not detected"
 	echo "Installing Homebrew"
 	echo "---- "
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    else
-        echo "Homebrew is installed!"
+  if [[ $OSTYPE = darwin* ]]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
+  elif [[ $OSTYPE = linux-gnu* ]]; then
+    CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+else
+  echo "Homebrew is installed!"
+fi
+
+# ZSH...
+echo "---- "
+echo "Checking for ZSH..."
+if [[ ! -n 'which zsh' ]]; then
+    echo "ZSH not detected..."
+    echo "Installing ZSH..."
+    echo "---- "
+    #Don't think I need a macOS option here since they all ship with zsh now. Maybe add later when i for loop this ish
+    if [[ $OSTYPE = linux-gnu ]]; then
+        sudo apt update && apt install zsh 
     fi
+else
+    echo "Git is already installed!"
 fi
 
 # Git...
@@ -65,6 +82,7 @@ else
 fi
 
 # 'Git-ing' my config files!!!!
+# TODO figure out how to authentication first otherwise this will fail
 echo "---- "
 echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then

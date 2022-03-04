@@ -1,6 +1,6 @@
 include:
   - .spacevim
-  - .fish
+  - .zim
   - .powerline_fonts
   - .pipenv
   - .vscode
@@ -8,6 +8,6 @@ include:
   - .defaults
   - .dock
   {% elif grains['os_family'] == 'Debian' %}
-  - .gnome_keyring
+  - .auth_stuff
   - .python3
   {% endif %}

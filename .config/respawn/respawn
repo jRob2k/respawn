@@ -62,10 +62,8 @@ case "$1" in
     state=""
     sc
 
-        # Launch fish if it's not already the shell.
-	# TODO: Should i change this to just be "prefered shell" or something instead of hardcoding fish?
-        if [[ $(echo $SHELL) != $FISH ]]; then
-            $FISH
+        if [[ $(echo $SHELL) != $ZSH ]]; then
+            $ZSH
         fi
         ;;
 
