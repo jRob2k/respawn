@@ -143,4 +143,3 @@ bindkey -M vicmd 'j' history-substring-search-down
 
 # Created by newuser for 5.8
 eval "$(starship init zsh)"
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
