@@ -28,6 +28,13 @@ if [[ ! -n 'which brew' ]]; then
   # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
   elif [[ $OSTYPE = linux-gnu* ]]; then
     CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Add Homebrew to the PATH
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    # Install Homebrew's dependancies
+    sudo apt-get install build-essential
+    # Install GCC per Homebrew's suggestion
+    brew install gcc
   fi
 else
   echo "Homebrew is installed!"
