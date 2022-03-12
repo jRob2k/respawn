@@ -36,6 +36,8 @@ if [[ ! -n 'which brew' ]]; then
     # Install GCC per Homebrew's suggestion
     brew install gcc
   fi
+  #Set Homebrew variable
+  BREW=`which brew`
 else
   echo "Homebrew is installed!"
 fi
@@ -55,7 +57,7 @@ else
     echo "Git is already installed!"
 fi
 
-# Git...
+# Git and GH...
 echo "---- "
 echo "Checking for Git..."
 if [[ ! -n 'which git' ]]; then
@@ -70,6 +72,18 @@ if [[ ! -n 'which git' ]]; then
 else
     echo "Git is already installed!"
 fi
+
+echo "---- "
+echo "Checking for Github CLI..."
+if [[ ! -n 'which gh' ]]; then
+    echo "Github CLI not detected..."
+    echo "Installing Github CLI..."
+    echo "---- "
+    $BREW install gh
+else
+    echo "Github CLI is already installed!"
+fi
+
 
 # GPG...
 echo "---- "
@@ -95,6 +109,7 @@ echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then
     echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
 fi
+echo "---- "
 if [[ ! -d ~/.git ]]; then
     echo "No git file in the home directory."
     echo "'Git-ing' my config files... hehe..."
