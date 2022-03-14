@@ -11,7 +11,7 @@ Set dock icon sizes smaller:
     - name: tilesize
     - domain: com.apple.dock
     - vtype: integer
-    - value: 36
+    - value: 50
     - user: {{ pillar['user'] }}
 
 {% for item in pillar['dock_removals'] %}
