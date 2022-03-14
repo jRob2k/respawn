@@ -114,6 +114,7 @@ if [[ ! -d ~/.git ]]; then
     echo "No git file in the home directory."
     echo "'Git-ing' my config files... hehe..."
     cd ~/
+    git config --global init.defaultBranch main
     git init
     git remote add origin git@github.com:jRob2k/respawn
     git fetch
