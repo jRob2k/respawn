@@ -5,14 +5,6 @@ Use column view for all Finder windows:
     - value: clmv
     - user: {{ pillar['user'] }}
 
-Allow text selection in Quicklook:
-  macdefaults.write:
-    - name: QLEnableTextSelection
-    - domain: com.apple.Finder
-    - vtype: bool
-    - value: True
-    - user: {{ pillar['user'] }}
-
 {% for key in ('ShowHardDrivesOnDesktop', 'ShowExternalHardDrivesOnDesktop', 'ShowMountedServersOnDesktop', 'ShowRemovableMediaOnDesktop') %}
 Show different devices on the Desktop - {{ key }}:
   macdefaults.write:
@@ -59,14 +51,6 @@ Don't spray .DS_Store all over network volumes:
   macdefaults.write:
     - name: DSDontWriteNetworkStores
     - domain: com.apple.Finder
-    - vtype: bool
-    - value: True
-    - user: {{ pillar['user'] }}
-
-Enable develop menu contextual item for all WebViews:
-  macdefaults.write:
-    - name: WebKitDeveloperExtras
-    - domain: NSGlobalDomain
     - vtype: bool
     - value: True
     - user: {{ pillar['user'] }}
