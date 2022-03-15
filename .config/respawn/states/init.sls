@@ -1,9 +1,6 @@
 include:
   - .spacevim
   - .zim
-  - .powerline_fonts
-  - .pipenv
-  - .vscode
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock

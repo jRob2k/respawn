@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Install and configure Salt and Homebrew. 
 # Syncs dotfiles via git.
@@ -9,7 +9,9 @@ RESPAWN_DIRECTORY=$HOME/.config/respawn
 BREW=`which brew`
 
 #Checking if the script has been run before
-if [[ -e $BOOTSTRAP_INDICATOR ]]; then
+if [[ $1 = -r ]]; then
+  echo "*sigh*....Running bootstrap script.....again..."
+elif [[ -e $BOOTSTRAP_INDICATOR ]]; then
     echo "Bootstrap has run for this user before...."
     echo "delete '~/.github/.respawn_bootstrap' to run again"
     echo "Exiting..."
@@ -19,7 +21,7 @@ fi
 # Checking for and installing....
 # Homebrew...
 echo "Checking for Homebrew"
-if [[ ! -n 'which brew' ]]; then
+if [[ ! -e "$(which brew)" ]]; then
   echo "Homebrew not detected"
 	echo "Installing Homebrew"
 	echo "---- "
@@ -45,7 +47,7 @@ fi
 # ZSH...
 echo "---- "
 echo "Checking for ZSH..."
-if [[ ! -n 'which zsh' ]]; then
+if [[ ! -e "$(which zsh)" ]]; then
     echo "ZSH not detected..."
     echo "Installing ZSH..."
     echo "---- "
@@ -60,7 +62,7 @@ fi
 # Git and GH...
 echo "---- "
 echo "Checking for Git..."
-if [[ ! -n 'which git' ]]; then
+if [[ ! -e "$(which git)" ]]; then
     echo "Git not detected..."
     echo "Installing Git..."
     echo "---- "
@@ -75,7 +77,7 @@ fi
 
 echo "---- "
 echo "Checking for Github CLI..."
-if [[ ! -n 'which gh' ]]; then
+if [[ ! -e "$(which gh)" ]]; then
     echo "Github CLI not detected..."
     echo "Installing Github CLI..."
     echo "---- "
@@ -107,7 +109,7 @@ fi
 echo "---- "
 echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then
-    echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
+   #echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
 fi
 echo "---- "
 if [[ ! -d ~/.git ]]; then
@@ -129,7 +131,7 @@ fi
 # Salt...
 echo "---- "
 echo "Checking for SALT..."
-if [[ ! -e 'which salt' ]]; then
+if [[ ! -e "$(which salt)" ]]; then
     echo "Salt not detected at '/etc/salt'"
     echo "Installing Salt..."
     echo "---- "
