@@ -53,7 +53,7 @@ if [[ ! -e "$(which zsh)" ]]; then
     echo "---- "
     #Don't think I need a macOS option here since they all ship with zsh now. Maybe add later when i for loop this ish
     if [[ $OSTYPE = linux-gnu ]]; then
-        sudo apt update && apt install zsh 
+        sudo apt update && sudo apt install zsh 
     fi
 else
     echo "Git is already installed!"
@@ -101,7 +101,6 @@ if [[ ! -e "$(which gpg)" ]]; then
     fi
 else
     echo "GPG already installed!"
-
 fi
 
 # 'Git-ing' my config files!!!!
@@ -109,7 +108,7 @@ fi
 echo "---- "
 echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then
-   #echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
+   echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
 fi
 echo "---- "
 if [[ ! -d ~/.git ]]; then
