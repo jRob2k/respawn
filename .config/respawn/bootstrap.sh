@@ -57,22 +57,22 @@ if [[ ! -e "$(which zsh)" ]]; then
         sudo apt update && sudo apt install zsh -y
     fi
 else
-    echo "Git is already installed!"
+    echo "ZSH is already installed!"
 fi
 
 # ZSH...
 echo "---- "
 echo "Checking for ZIM..."
-if [[ ! -e "$(which $ZIM_HOME)" ]]; then
+if [[ ! -d $ZIM_HOME ]]; then
     echo "ZIM not detected..."
     echo "Installing ZIM..."
     echo "---- "
-    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    #curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
     echo "Installing starship"
-    $BREW install starship
+    #$BREW install starship
     eval "$(starship init zsh)"
 else
-    echo "Git is already installed!"
+    echo "ZIM is already installed!"
 fi
 
 # Git and GH...
@@ -119,6 +119,47 @@ else
     echo "GPG already installed!"
 fi
 
+#1Password CLI...
+echo "---- "
+echo "Checking for 1Password CLI..."
+if [[ ! -e  "$(which op)" ]]; then
+  echo "1Password CLI not detected..."
+  echo "Installing 1Password CLI..."
+  if [[ $OSTYPE = linux-gnu* ]]; then
+
+    #Adding the key for the 1Password Apt repository
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+
+    #Add the 1Password Apt repository
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+    sudo tee /etc/apt/sources.list.d/1password.list
+
+    # Add the debsig-verify policy:
+    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+
+    #Install 1Password CLI
+    sudo apt update && sudo apt install 1password-cli
+  fi
+else
+  echo "1Password CLI is already installed!"
+fi
+
+#TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
+#Checking 1Password signin...
+echo "---- "
+if [[ $(op account list) = "" ]]; then
+  echo "No not signed into OP."
+else
+  echo "Already signed into OP"
+fi
+
+    
 # 'Git-ing' my config files!!!!
 # TODO figure out how to authentication first otherwise this will fail
 echo "---- "
@@ -146,7 +187,7 @@ fi
 # Installing powerline fonts
 echo "---- "
 echo "Installing Powerline Fonts"
-~/.config/respawn/fonts/install.sh
+~/.config/respawn/files/fonts/install.sh
 
 # Salt...
 echo "---- "
