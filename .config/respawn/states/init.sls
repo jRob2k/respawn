@@ -1,6 +1,5 @@
 include:
   - .spacevim
-  - .zim
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock

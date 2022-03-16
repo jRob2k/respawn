@@ -32,6 +32,7 @@ if [[ ! -e "$(which brew)" ]]; then
     CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     # Add Homebrew to the PATH
     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     # Install Homebrew's dependancies
     sudo apt-get install build-essential
@@ -55,6 +56,21 @@ if [[ ! -e "$(which zsh)" ]]; then
     if [[ $OSTYPE = linux-gnu ]]; then
         sudo apt update && sudo apt install zsh 
     fi
+else
+    echo "Git is already installed!"
+fi
+
+# ZSH...
+echo "---- "
+echo "Checking for ZIM..."
+if [[ ! -e "$(which $ZIM_HOME)" ]]; then
+    echo "ZIM not detected..."
+    echo "Installing ZIM..."
+    echo "---- "
+    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    echo "Installing starship"
+    $BREW install starship
+    eval "$(starship init zsh)"
 else
     echo "Git is already installed!"
 fi
