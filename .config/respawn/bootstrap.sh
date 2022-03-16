@@ -143,6 +143,11 @@ else
     echo "Use the '-git' flag to overwrite local files"
 fi
 
+# Installing powerline fonts
+echo "---- "
+echo "Installing Powerline Fonts"
+~/.config/respawn/fonts/install.sh
+
 # Salt...
 echo "---- "
 echo "Checking for SALT..."
@@ -170,8 +175,8 @@ chmod +x respawn
 /bin/bash respawn -g 
 
 # Touching a file so bootstrap knows it's been run
-#echo "---- "
-#echo "Creating bootstrap indicator --> $BOOTSTRAP_INDICATOR"
-#printf -v date '%(%Y-%m-%d %H:%M:%S)T\n' -1 
-#echo "respawn bootstrap ran on $date" > $BOOTSTRAP_INDICATOR 
+echo "---- "
+echo "Creating bootstrap indicator --> $BOOTSTRAP_INDICATOR"
+printf -v date '%(%Y-%m-%d %H:%M:%S)T\n' -1 
+echo "respawn bootstrap ran on $date" > $BOOTSTRAP_INDICATOR 
 
