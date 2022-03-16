@@ -53,7 +53,7 @@ if [[ ! -e "$(which zsh)" ]]; then
     echo "---- "
     #Don't think I need a macOS option here since they all ship with zsh now. Maybe add later when i for loop this ish
     if [[ $OSTYPE = linux-gnu ]]; then
-        sudo apt update && sudo apt install zsh 
+        sudo apt update && sudo apt install zsh -y
     fi
 else
     echo "Git is already installed!"
@@ -97,7 +97,7 @@ if [[ ! -e "$(which gpg)" ]]; then
         $BREW install gpg
     elif [[ $OSTYPE = linux-gnu* ]]; then
         sudo apt update
-        sudo apt install gpg
+        sudo apt install gpg -y
     fi
 else
     echo "GPG already installed!"
@@ -151,7 +151,7 @@ echo "Running Respawn Salt Highstate..."
 echo "Hold on to your butts..."
 cd ~/.config/respawn
 chmod +x respawn
-/bin/bash respawn -go 
+/bin/bash respawn -g 
 
 # Touching a file so bootstrap knows it's been run
 #echo "---- "
