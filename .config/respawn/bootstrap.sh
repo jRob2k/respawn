@@ -130,7 +130,7 @@ fi
 # Salt...
 echo "---- "
 echo "Checking for SALT..."
-if [[ ! -e "$(which salt)" ]]; then
+if [[ ! -e "$(which salt-call)" ]]; then
     echo "Salt not detected at '/etc/salt'"
     echo "Installing Salt..."
     echo "---- "
