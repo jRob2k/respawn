@@ -118,48 +118,57 @@ if [[ ! -e "$(which gpg)" ]]; then
 else
     echo "GPG already installed!"
 fi
-
-#1Password CLI...
-echo "---- "
-echo "Checking for 1Password CLI..."
-if [[ ! -e  "$(which op)" ]]; then
-  echo "1Password CLI not detected..."
-  echo "Installing 1Password CLI..."
-  if [[ $OSTYPE = linux-gnu* ]]; then
-
-    #Adding the key for the 1Password Apt repository
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
-
-    #Add the 1Password Apt repository
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
-    sudo tee /etc/apt/sources.list.d/1password.list
-
-    # Add the debsig-verify policy:
-    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
-    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
-    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-
-    #Install 1Password CLI
-    sudo apt update && sudo apt install 1password-cli
-  fi
+# SSH restore flow. Skipping if "--noauth" flag is sent
+if $1 = "--noauth"; then
+  echo "Skipping Auth and SSH Restore"
 else
-  echo "1Password CLI is already installed!"
-fi
+  #TODO: Get this working properly
+  #Check if ssh keys exist. This probably works..
+  if [ "$(ls -A ~/.ssh)" ]; then
+    echo "SSH directory and keys exist. Skipping Auth and SSH Restore"
+  else
+  # Checking for 1Password CLI...
+    echo "---- "
+    echo "Checking for 1Password CLI..."
+    if [[ ! -e  "$(which op)" ]]; then
+      echo "1Password CLI not detected..."
+      echo "Installing 1Password CLI..."
+      if [[ $OSTYPE = linux-gnu* ]]; then
 
-#TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
-#Checking 1Password signin...
-echo "---- "
-if [[ $(op account list) = "" ]]; then
-  echo "No not signed into OP."
-else
-  echo "Already signed into OP"
-fi
+        #Adding the key for the 1Password Apt repository
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+        sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
 
+        #Add the 1Password Apt repository
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+        sudo tee /etc/apt/sources.list.d/1password.list
+
+        # Add the debsig-verify policy:
+        sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+        curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+        sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+        sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+        sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
     
+        #Install 1Password CLI
+        sudo apt update && sudo apt install 1password-cli
+      fi
+    else
+      echo "1Password CLI is already installed!"
+    fi
+fi
+    
+    #TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
+    #Checking 1Password signin...
+    echo "---- "
+    if [[ $(op account list) = "" ]]; then
+      echo "No not signed into OP."
+    else
+      echo "Already signed into OP"
+    fi
+
+      
 # 'Git-ing' my config files!!!!
 # TODO figure out how to authentication first otherwise this will fail
 echo "---- "
