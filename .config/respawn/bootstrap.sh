@@ -63,13 +63,14 @@ fi
 # ZSH...
 echo "---- "
 echo "Checking for ZIM..."
-if [[ ! -d $ZIM_HOME ]]; then
+#When checking if a variable location is a directory, add the '/'!!!!!
+if [[ ! -d $ZIM_HOME/ ]]; then
     echo "ZIM not detected..."
     echo "Installing ZIM..."
     echo "---- "
-    #curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
     echo "Installing starship"
-    #$BREW install starship
+    $BREW install starship
     eval "$(starship init zsh)"
 else
     echo "ZIM is already installed!"
@@ -169,8 +170,14 @@ fi
     #TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
     #Getting ssh key and setting them to variables
     ssh_key=$(op item get "respawn SSH Key" --fields label=notesPlain)
-    r="'ssh -i ${password:1:-1}'"
-
+    #Making a temporary file to hold the ssh key
+    tmp_key="$(mktemp)"
+    #stripping the quotes from the key (artifact of 1password)
+    echo "${ssh_key:1:-1}" > $tmp_key
+    #creating a quick variable to use when Git-ing files
+    r="'ssh -i $tmp_key'"
+    echo $tmp_key
+    #Sign out!
     opoff() {
       op signout
       unset OP_SESSION_jrob2k
