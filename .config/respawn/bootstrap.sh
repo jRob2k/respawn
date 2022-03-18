@@ -119,69 +119,62 @@ if [[ ! -e "$(which gpg)" ]]; then
 else
     echo "GPG already installed!"
 fi
-# SSH restore flow. Skipping if "--noauth" flag is sent
-if $1 = "--noauth"; then
+
+#Git flow, complete with 1Password integration and dedicated respawn key.
+#Skipping flow with appropriate flag
+if [[ $1 = "--nogit" ]]; then
   echo "Skipping Auth and SSH Restore"
 else
-  #TODO: Get this working properly
-  #Check if ssh keys exist. This probably works..
-  if [ "$(ls -A ~/.ssh)" ]; then
-    echo "SSH directory and keys exist. Skipping Auth and SSH Restore"
-  else
-  # Checking for 1Password CLI...
-    echo "---- "
-    echo "Checking for 1Password CLI..."
-    if [[ ! -e  "$(which op)" ]]; then
-      echo "1Password CLI not detected..."
-      echo "Installing 1Password CLI..."
-      if [[ $OSTYPE = linux-gnu* ]]; then
+# Checking for 1Password CLI...
+  echo "---- "
+  echo "Checking for 1Password CLI..."
+  if [[ ! -e  "$(which op)" ]]; then
+    echo "1Password CLI not detected..."
+    echo "Installing 1Password CLI..."
+    if [[ $OSTYPE = linux-gnu* ]]; then
+      #Adding the key for the 1Password Apt repository
+      curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+      sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
 
-        #Adding the key for the 1Password Apt repository
-        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-        sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+      #Add the 1Password Apt repository
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+      sudo tee /etc/apt/sources.list.d/1password.list
 
-        #Add the 1Password Apt repository
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
-        sudo tee /etc/apt/sources.list.d/1password.list
-
-        # Add the debsig-verify policy:
-        sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
-        curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-        sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
-        sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
-        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-        sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-    
-        #Install 1Password CLI
-        sudo apt update && sudo apt install 1password-cli
-      fi
-    else
-      echo "1Password CLI is already installed!"
+      # Add the debsig-verify policy:
+      sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+      curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+      sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+      sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+      curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+      sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+  
+      #Install 1Password CLI
+      sudo apt update && sudo apt install 1password-cli
     fi
-fi
+  else
+    echo "1Password CLI is already installed!"
     
-    #Checking 1Password signin...
-    echo "---- "
-    opon() {
-      if [[ -z $OP_SESSION_jrob ]]; then
-      eval $(op signin)
-      fi
-    }
-    #TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
-    #Getting ssh key and setting them to variables
-    ssh_key=$(op item get "respawn SSH Key" --fields label=notesPlain)
-    #Making a temporary file to hold the ssh key
-    tmp_key="$(mktemp)"
-    #stripping the quotes from the key (artifact of 1password)
-    echo "${ssh_key:1:-1}" > $tmp_key
-    #creating a quick variable to use when Git-ing files
-    r="'ssh -i $tmp_key'"
-    echo $tmp_key
-    #Sign out!
-    opoff() {
-      op signout
-      unset OP_SESSION_jrob2k
-    }
+  # Signing into 1Password, snag my respawn key and use it with git.
+  echo "---- "
+  echo "Signing into 1Password as jrob"
+  if [[ -z $OP_SESSION_jrob ]]; then
+  eval $(op signin)
+  fi
+
+  # TODO Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
+  #Getting ssh key and setting them to variables
+  ssh_key=$(op item get "respawn SSH Key" --fields label=notesPlain)
+  #Making a temporary file to hold the ssh key
+  tmp_key="$(mktemp)"
+  #stripping the quotes from the key (artifact of 1password)
+  echo "${ssh_key:1:-1}" > $tmp_key
+  #creating a quick variable to use when Git-ing files
+  r="'ssh -i $tmp_key'"
+  echo $tmp_key
+
+  #Sign out!
+  op signout
+  unset OP_SESSION_jrob2k
       
 # 'Git-ing' my config files!!!!
 # TODO figure out how to authentication first otherwise this will fail
