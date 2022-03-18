@@ -159,15 +159,22 @@ else
     fi
 fi
     
-    #TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
     #Checking 1Password signin...
     echo "---- "
-    if [[ $(op account list) = "" ]]; then
-      echo "No not signed into OP."
-    else
-      echo "Already signed into OP"
-    fi
+    opon() {
+      if [[ -z $OP_SESSION_jrob ]]; then
+      eval $(op signin)
+      fi
+    }
+    #TODO: Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
+    #Getting ssh key and setting them to variables
+    ssh_key=$(op item get "respawn SSH Key" --fields label=notesPlain)
+    r="'ssh -i ${password:1:-1}'"
 
+    opoff() {
+      op signout
+      unset OP_SESSION_jrob2k
+    }
       
 # 'Git-ing' my config files!!!!
 # TODO figure out how to authentication first otherwise this will fail
@@ -183,9 +190,9 @@ if [[ ! -d ~/.git ]]; then
     cd ~/
     git config --global init.defaultBranch main
     git init
-    git remote add origin git@github.com:jRob2k/respawn
-    git fetch
-    git checkout -f main
+    $r git remote add origin git@github.com:jRob2k/respawn
+    $r git fetch
+    $r git checkout -f main
     echo "Got my config files!!!"
 else
     echo "The home directory already has a git file."
