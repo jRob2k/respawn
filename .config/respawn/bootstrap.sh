@@ -8,191 +8,245 @@ BOOTSTRAP_INDICATOR=$HOME/.github/.respawn_bootstrap
 RESPAWN_DIRECTORY=$HOME/.config/respawn
 BREW=`which brew`
 
-#Checking if the script has been run before
-if [[ $1 = -r ]]; then
-  echo "*sigh*....Running bootstrap script.....again..."
-elif [[ -e $BOOTSTRAP_INDICATOR ]]; then
-    echo "Bootstrap has run for this user before...."
-    echo "delete '~/.github/.respawn_bootstrap' to run again"
-    echo "Exiting..."
-    exit 0
-fi
-
-# Checking for and installing....
-# Homebrew...
-echo "Checking for Homebrew"
-if [[ ! -e "$(which brew)" ]]; then
-  echo "Homebrew not detected"
-	echo "Installing Homebrew"
-	echo "---- "
-  if [[ $OSTYPE = darwin* ]]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
-  elif [[ $OSTYPE = linux-gnu* ]]; then
-    CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Add Homebrew to the PATH
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    # Install Homebrew's dependancies
-    sudo apt-get install build-essential
-    # Install GCC per Homebrew's suggestion
-    brew install gcc
-  fi
-  #Set Homebrew variable
-  BREW=`which brew`
-else
-  echo "Homebrew is installed!"
-fi
-
-# ZSH...
-echo "---- "
-echo "Checking for ZSH..."
-if [[ ! -e "$(which zsh)" ]]; then
-    echo "ZSH not detected..."
-    echo "Installing ZSH..."
-    echo "---- "
-    #Don't think I need a macOS option here since they all ship with zsh now. Maybe add later when i for loop this ish
-    if [[ $OSTYPE = linux-gnu ]]; then
-        sudo apt update && sudo apt install zsh -y
+# Script Functions
+# ~~~
+# Check if script has been run before
+check_for_previous_run () {
+    # Skip check and run again if '-r' set
+    if [[ $1 = -r ]]; then
+      echo "*sigh*....Running bootstrap script.....again..."
+    elif [[ -e $BOOTSTRAP_INDICATOR ]]; then
+        echo "Bootstrap has run for this user before...."
+        echo "delete '~/.github/.respawn_bootstrap' to run again"
+        echo "Exiting..."
+        exit 0
     fi
-else
-    echo "ZSH is already installed!"
-fi
-
-# ZSH...
-echo "---- "
-echo "Checking for ZIM..."
+}
+# ~~~
+# Check for installed pkg. Accepts software name and which variable search as arguments respectively (i.e. Homebrew brew).
 #When checking if a variable location is a directory, add the '/'!!!!!
-if [[ ! -d $ZIM_HOME/ ]]; then
-    echo "ZIM not detected..."
-    echo "Installing ZIM..."
-    echo "---- "
-    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-    echo "Installing starship"
-    $BREW install starship
-    eval "$(starship init zsh)"
-else
-    echo "ZIM is already installed!"
-fi
-
-# Git and GH...
-echo "---- "
-echo "Checking for Git..."
-if [[ ! -e "$(which git)" ]]; then
-    echo "Git not detected..."
-    echo "Installing Git..."
-    echo "---- "
-    if [[ $OSTYPE = darwin* ]]; then
-        $BREW install git
-    elif [[ $OSTYPE = linux-gnu ]]; then
-        sudo apt update && apt install git
+check_for_software () {
+    echo "Checking for $1..."
+    # Check for specific software by config
+    config_software=("ZIM")
+    if [[ ${config_software[*]} =~ d ]]; then
+        if [[ ! -d $2 ]]; then
+            echo "$1 not detected."
+            install_thing $1
+        fi
+    #Check by which
+    elif [[ ! -e "$(which $2)" ]]; then
+        echo "$1 not detected."
+        install_thing $1
+    else
+        echo "$1 already installed!"
     fi
-else
-    echo "Git is already installed!"
-fi
+}
+# ~~~
+# Install function for my various software.
+install_thing () {
+    echo "Installing $1."
+    echo "---"
+    #Homebrew installation
+    if $1 = "Homebrew"; then
+        # macOS Installation 
+        if [[ $OSTYPE = darwin* ]]; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+            # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
+        # Linux Installation (ChromeOS)
+        elif [[ $OSTYPE = linux-gnu* ]]; then
+          CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          # Add Homebrew to the PATH
+          echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
+          echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          # Install Homebrew's dependancies
+          sudo apt-get install build-essential
+          # Install GCC per Homebrew's suggestion
+          brew install gcc
+        fi
+        #Set Homebrew variable
+        BREW=`which brew`
+    #ZSH Installation
+    elif $1 = "ZShell"; then
+        # macOS installation shouldn't be necessary
+        # Linux installation. 
+        if [[ $OSTYPE = linux-gnu ]]; then
+            sudo apt update && sudo apt install zsh -y
+        fi
+    elif $1 = "ZIM"; then
+        curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+        echo "Installing starship"
+        $BREW install starship
+        eval "$(starship init zsh)"
+    # GIT Installation
+    elif $1 = "GIT"; then
+        if [[ $OSTYPE = darwin* ]]; then
+            $BREW install git
+        elif [[ $OSTYPE = linux-gnu ]]; then
+            sudo apt update && apt install git
+        fi
+    # Github CLI Installation
+    elif $1 = "Github_CLI"; then
+        $BREW install gh
+    # GPG Installation
+    elif $1 = "GPG"; then
+        if [[ $OSTYPE = darwin* ]]; then
+            $BREW install gpg
+        elif [[ $OSTYPE = linux-gnu* ]]; then
+            sudo apt update
+            sudo apt install gpg -y
+        fi
+    elif $1 = "Salt"; then
+        curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
+    # 1Password Installation
+    elif $1 = "1Password"; then
+        if [[ $OSTYPE = linux-gnu* ]]; then
+        #Adding the key for the 1Password Apt repository
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+        sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
 
-echo "---- "
-echo "Checking for Github CLI..."
-if [[ ! -e "$(which gh)" ]]; then
-    echo "Github CLI not detected..."
-    echo "Installing Github CLI..."
-    echo "---- "
-    $BREW install gh
-else
-    echo "Github CLI is already installed!"
-fi
+        #Add the 1Password Apt repository
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+        sudo tee /etc/apt/sources.list.d/1password.list
 
-
-# GPG...
-echo "---- "
-echo "Checking for GPG..."
-if [[ ! -e "$(which gpg)" ]]; then
-    echo "GPG not detected..."
-    echo "Installing GPG..."	
-    if [[ $OSTYPE = darwin* ]]; then
-        $BREW install gpg
-    elif [[ $OSTYPE = linux-gnu* ]]; then
-        sudo apt update
-        sudo apt install gpg -y
+        # Add the debsig-verify policy:
+        sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+        curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+        sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+        sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+        sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+    
+        #Install 1Password CLI
+        sudo apt update && sudo apt install 1password-cli
+        fi
     fi
-else
-    echo "GPG already installed!"
-fi
 
-#Git flow, complete with 1Password integration and dedicated respawn key.
-#Skipping flow with appropriate flag
-if [[ $1 = "--nogit" ]]; then
-  echo "Skipping Auth and SSH Restore"
-else
-# Checking for 1Password CLI...
-  echo "---- "
-  echo "Checking for 1Password CLI..."
-  if [[ ! -e  "$(which op)" ]]; then
-    echo "1Password CLI not detected..."
-    echo "Installing 1Password CLI..."
-    if [[ $OSTYPE = linux-gnu* ]]; then
-      #Adding the key for the 1Password Apt repository
-      curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-      sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+}
 
-      #Add the 1Password Apt repository
-      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
-      sudo tee /etc/apt/sources.list.d/1password.list
+# Softare to install as an associated array (dictionary). No spaces!
+# Need to figure out the order. Homebrew should be first.
+declare -A software
 
-      # Add the debsig-verify policy:
-      sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
-      curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-      sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
-      sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
-      curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-      sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+# ZSH
+software["ZShell"]="zsh"
+# Homebrew
+# software["Homebrew"]="brew"
+# Git
+software["GIT"]="git"
+# Github CLI
+software["Github_CLI"]="gh"
+# GPG
+software["GPG"]="gpg"
+# Salt
+software["Salt"]="salt-call"
+
+# Check if script has been run before
+check_for_previous_run $1
+
+# Install priority software first
+echo "$(check_for_software "Homebrew" "brew")"
+echo "~~~~"
+# Loop through software array and install if not already installed
+# For every key in the associative array..
+for s in "${!software[@]}"; do
+    echo "$(check_for_software $s ${software[$s]})"
+    echo "~~~~"
+done
+
+
+#Checking for 1Password CLI...
+echo "---- "
+echo "Checking for 1Password CLI..."
+if [[ ! -e  "$(which op)" ]]; then
+  echo "1Password CLI not detected..."
+  echo "Installing 1Password CLI..."
+  if [[ $OSTYPE = linux-gnu* ]]; then
+    #Adding the key for the 1Password Apt repository
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+
+    #Add the 1Password Apt repository
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+    sudo tee /etc/apt/sources.list.d/1password.list
+
+    # Add the debsig-verify policy:
+    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
   
-      #Install 1Password CLI
-      sudo apt update && sudo apt install 1password-cli
+    #Install 1Password CLI
+    sudo apt update && sudo apt install 1password-cli
     fi
   else
     echo "1Password CLI is already installed!"
-    
+fi    
   # Signing into 1Password, snag my respawn key and use it with git.
-  echo "---- "
-  echo "Signing into 1Password as jrob"
-  if [[ -z $OP_SESSION_jrob ]]; then
-  eval $(op signin)
-  fi
+echo "---- "
+echo "Signing into 1Password as $1"
+if [[ -z $OP_SESSION_respawn ]]; then
+eval $(op signin)
+fi
 
-  # TODO Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
-  #Getting ssh key and setting them to variables
-  ssh_key=$(op item get "respawn SSH Key" --fields label=notesPlain)
-  #Making a temporary file to hold the ssh key
-  tmp_key="$(mktemp)"
-  #stripping the quotes from the key (artifact of 1password)
-  echo "${ssh_key:1:-1}" > $tmp_key
-  #creating a quick variable to use when Git-ing files
-  r="'ssh -i $tmp_key'"
-  echo $tmp_key
+# TODO Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
+#Getting ssh key and setting them to variables
+ssh_key=$(op item get "respawn - SSH Key" --fields label=notesPlain)
+#Making a temporary file to hold the ssh key
+tmp_key="$(mktemp)"
+#stripping the quotes from the key (artifact of 1password)
+echo "${ssh_key:1:-1}" > $tmp_key
+#creating a quick variable to use when Git-ing files
+r="'ssh -i $tmp_key'"
+echo $tmp_key
 
-  #Sign out!
-  op signout
-  unset OP_SESSION_jrob2k
+#Sign out!
+op signout
+unset OP_SESSION_jrob2k
       
+GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git pull 
 # 'Git-ing' my config files!!!!
 # TODO figure out how to authentication first otherwise this will fail
 echo "---- "
 echo "Checking for .git in $HOME"
 if [[ $1 == '-git' ]]; then
-   echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
+  echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
 fi
-echo "---- "
+echo "~~~~"
 if [[ ! -d ~/.git ]]; then
+    # Check for and install 1Password
+    echo "$(check_for_software "1Password" "op")"
+    # Signing into 1Password, snag my respawn key and use it with git.
+    echo "---- "
+    echo "Signing into 1Password as $1"
+    if [[ -z $OP_SESSION_respawn ]]; then
+    eval $(op signin)
+    fi
+
+    #Getting respawn ssh key and setting them to variables
+    ssh_key=$(op item get "respawn - SSH Key" --fields label=notesPlain)
+    #Making a temporary file to hold the ssh key
+    respawn_key="$(mktemp)"
+    #stripping the quotes from the key (artifact of 1password)
+    echo "${ssh_key:1:-1}" > $tmp_key
+
+    #Sign out!
+    op signout
+    unset OP_SESSION_respawn
+        
+    # Git config files
+    # Using the "GIT_SSH_COMMAND" to use the respawn key
     echo "No git file in the home directory."
     echo "'Git-ing' my config files... hehe..."
     cd ~/
     git config --global init.defaultBranch main
     git init
-    $r git remote add origin git@github.com:jRob2k/respawn
-    $r git fetch
-    $r git checkout -f main
+    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git remote add origin git@github.com:jRob2k/respawn
+    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git fetch
+    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git checkout -f main
     echo "Got my config files!!!"
 else
     echo "The home directory already has a git file."
@@ -201,21 +255,9 @@ else
 fi
 
 # Installing powerline fonts
-echo "---- "
-echo "Installing Powerline Fonts"
-~/.config/respawn/files/fonts/install.sh
-
-# Salt...
-echo "---- "
-echo "Checking for SALT..."
-if [[ ! -e "$(which salt-call)" ]]; then
-    echo "Salt not detected at '/etc/salt'"
-    echo "Installing Salt..."
-    echo "---- "
-    curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
-else
-    echo "Salt is already  installed!"
-fi
+# echo "---- "
+# echo "Installing Powerline Fonts"
+# ~/.config/respawn/files/fonts/install.sh
 
 # Create/update minion config that points to this dir.
 echo "---- "
