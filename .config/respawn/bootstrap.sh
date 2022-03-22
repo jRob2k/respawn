@@ -6,6 +6,7 @@
 
 BOOTSTRAP_INDICATOR=$HOME/.github/.respawn_bootstrap
 RESPAWN_DIRECTORY=$HOME/.config/respawn
+RESPAWN_KEY=$HOME/.ssh/respawn_key
 BREW=`which brew`
 
 # Script Functions
@@ -27,14 +28,14 @@ check_for_previous_run () {
 #When checking if a variable location is a directory, add the '/'!!!!!
 check_for_software () {
     echo "Checking for $1..."
-    # Check for specific software by config
+    # Check for software by config
     config_software=("ZIM")
     if [[ ${config_software[*]} =~ d ]]; then
         if [[ ! -d $2 ]]; then
             echo "$1 not detected."
             install_thing $1
         fi
-    #Check by which
+    # Check for software by which
     elif [[ ! -e "$(which $2)" ]]; then
         echo "$1 not detected."
         install_thing $1
@@ -131,8 +132,6 @@ declare -A software
 
 # ZSH
 software["ZShell"]="zsh"
-# Homebrew
-# software["Homebrew"]="brew"
 # Git
 software["GIT"]="git"
 # Github CLI
@@ -155,109 +154,57 @@ for s in "${!software[@]}"; do
     echo "~~~~"
 done
 
-
-#Checking for 1Password CLI...
-echo "---- "
-echo "Checking for 1Password CLI..."
-if [[ ! -e  "$(which op)" ]]; then
-  echo "1Password CLI not detected..."
-  echo "Installing 1Password CLI..."
-  if [[ $OSTYPE = linux-gnu* ]]; then
-    #Adding the key for the 1Password Apt repository
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
-
-    #Add the 1Password Apt repository
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
-    sudo tee /etc/apt/sources.list.d/1password.list
-
-    # Add the debsig-verify policy:
-    sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
-    curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-    sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
-    sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-    sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-  
-    #Install 1Password CLI
-    sudo apt update && sudo apt install 1password-cli
-    fi
-  else
-    echo "1Password CLI is already installed!"
-fi    
-  # Signing into 1Password, snag my respawn key and use it with git.
-echo "---- "
-echo "Signing into 1Password as $1"
-if [[ -z $OP_SESSION_respawn ]]; then
-eval $(op signin)
-fi
-
-# TODO Use this to sign in https://austincloud.guru/2018/11/27/1password-cli-tricks/
-#Getting ssh key and setting them to variables
-ssh_key=$(op item get "respawn - SSH Key" --fields label=notesPlain)
-#Making a temporary file to hold the ssh key
-tmp_key="$(mktemp)"
-#stripping the quotes from the key (artifact of 1password)
-echo "${ssh_key:1:-1}" > $tmp_key
-#creating a quick variable to use when Git-ing files
-r="'ssh -i $tmp_key'"
-echo $tmp_key
-
-#Sign out!
-op signout
-unset OP_SESSION_jrob2k
-      
-GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git pull 
-# 'Git-ing' my config files!!!!
-# TODO figure out how to authentication first otherwise this will fail
-echo "---- "
-echo "Checking for .git in $HOME"
-if [[ $1 == '-git' ]]; then
-  echo "Deleting ~/.git and overwriting configs since you used the '-git' flag"
-fi
-echo "~~~~"
+echo "~~~~ "
+# Checking for git file. Skipping if there isn't one
 if [[ ! -d ~/.git ]]; then
-    # Check for and install 1Password
-    echo "$(check_for_software "1Password" "op")"
-    # Signing into 1Password, snag my respawn key and use it with git.
-    echo "---- "
-    echo "Signing into 1Password as $1"
-    if [[ -z $OP_SESSION_respawn ]]; then
-    eval $(op signin)
-    fi
+    # Check for respawn key and get one if it doesn't
+    if [[ -e $RESPAWN_KEY ]]; then
+        echo "Respawn key, already exists!"
+    else
+        echo "No Respawn key, obtaining one...."
+        # Check for and install 1Password
+        echo "$(check_for_software "1Password" "op")"
+        # Sign into 1Password, get my respawn key and save to .ssh.
+         # Create ssh directory if it doesn't exist
+        if [[ ! -d "$HOME/.ssh" ]]; then
+            mkdir $HOME/.ssh
+        fi
+        touch $RESPAWN_KEY
+        echo "Signing into 1Password"
+        if [[ -z $OP_SESSION_respawn ]]; then
+            eval $(op signin)
+        fi
+        # Getting respawn ssh key
+        ssh_key=$(op item get "respawn - SSH Key" --fields label=notesPlain)
+        # Strip quotes from the key (artifact of 1password) and save as respawn key
+        echo "${ssh_key:1:-1}" > $RESPAWN_KEY
+        sudo chmod 0600 $RESPAWN_KEY
 
-    #Getting respawn ssh key and setting them to variables
-    ssh_key=$(op item get "respawn - SSH Key" --fields label=notesPlain)
-    #Making a temporary file to hold the ssh key
-    respawn_key="$(mktemp)"
-    #stripping the quotes from the key (artifact of 1password)
-    echo "${ssh_key:1:-1}" > $tmp_key
-
-    #Sign out!
-    op signout
-    unset OP_SESSION_respawn
-        
+        #Sign out!
+        op signout
+        unset OP_SESSION_respawn
+    fi        
     # Git config files
-    # Using the "GIT_SSH_COMMAND" to use the respawn key
-    echo "No git file in the home directory."
+    # Setting the "GIT_SSH_COMMAND" env variable so git uses the respawn key
+    export GIT_SSH_COMMAND="ssh -i $RESPAWN_KEY -o IdentitiesOnly=yes"
     echo "'Git-ing' my config files... hehe..."
     cd ~/
     git config --global init.defaultBranch main
     git init
-    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git remote add origin git@github.com:jRob2k/respawn
-    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git fetch
-    GIT_SSH_COMMAND='ssh -i $tmp_key -o IdentitiesOnly=yes' git checkout -f main
+    git remote add origin git@github.com:jRob2k/respawn
+    git fetch
+    git checkout -f main
+    # Unsetting GIT_SSH_COMMAND so normal SSH keys from the config are used
+    unset GIT_SSH_COMMAND
     echo "Got my config files!!!"
 else
-    echo "The home directory already has a git file."
-    echo "Use git to fetch config files if they need to be updated"
-    echo "Use the '-git' flag to overwrite local files"
+    echo "The home directory already has a git file. Skipping git steps."
 fi
 
 # Installing powerline fonts
-# echo "---- "
-# echo "Installing Powerline Fonts"
-# ~/.config/respawn/files/fonts/install.sh
+echo "---- "
+echo "Installing Powerline Fonts"
+~/.config/respawn/files/fonts/install.sh
 
 # Create/update minion config that points to this dir.
 echo "---- "
