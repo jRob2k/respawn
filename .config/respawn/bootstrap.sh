@@ -33,97 +33,107 @@ check_for_software () {
     if [[ ${config_software[*]} =~ d ]]; then
         if [[ ! -d $2 ]]; then
             echo "$1 not detected."
+            echo "Installing $1."
+            echo "~~~~"
             install_thing $1
         fi
     # Check for software by which
     elif [[ ! -e "$(which $2)" ]]; then
         echo "$1 not detected."
+        echo "Installing $1."
+        echo "~~~~"
         install_thing $1
     else
         echo "$1 already installed!"
     fi
 }
 # ~~~
-# Install function for my various software.
 install_thing () {
-    echo "Installing $1."
-    echo "---"
-    #Homebrew installation
-    if $1 = "Homebrew"; then
-        # macOS Installation 
-        if [[ $OSTYPE = darwin* ]]; then
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-            # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
-        # Linux Installation (ChromeOS)
-        elif [[ $OSTYPE = linux-gnu* ]]; then
-          CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          # Add Homebrew to the PATH
-          echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
-          echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          # Install Homebrew's dependancies
-          sudo apt-get install build-essential
-          # Install GCC per Homebrew's suggestion
-          brew install gcc
-        fi
-        #Set Homebrew variable
-        BREW=`which brew`
-    #ZSH Installation
-    elif $1 = "ZShell"; then
-        # macOS installation shouldn't be necessary
-        # Linux installation. 
-        if [[ $OSTYPE = linux-gnu ]]; then
-            sudo apt update && sudo apt install zsh -y
-        fi
-    elif $1 = "ZIM"; then
-        curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-        echo "Installing starship"
-        $BREW install starship
-        eval "$(starship init zsh)"
-    # GIT Installation
-    elif $1 = "GIT"; then
-        if [[ $OSTYPE = darwin* ]]; then
-            $BREW install git
-        elif [[ $OSTYPE = linux-gnu ]]; then
-            sudo apt update && apt install git
-        fi
-    # Github CLI Installation
-    elif $1 = "Github_CLI"; then
-        $BREW install gh
-    # GPG Installation
-    elif $1 = "GPG"; then
-        if [[ $OSTYPE = darwin* ]]; then
-            $BREW install gpg
-        elif [[ $OSTYPE = linux-gnu* ]]; then
-            sudo apt update
-            sudo apt install gpg -y
-        fi
-    elif $1 = "Salt"; then
-        curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
-    # 1Password Installation
-    elif $1 = "1Password"; then
-        if [[ $OSTYPE = linux-gnu* ]]; then
-        #Adding the key for the 1Password Apt repository
-        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-        sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+    case "$1" in
+        "Homebrew")
+            #Homebrew installation
+            if [[ $OSTYPE = darwin* ]]; then
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+                # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
+            # Linux Installation (ChromeOS)
+            elif [[ $OSTYPE = linux-gnu* ]]; then
+                CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                # Add Homebrew to the PATH
+                echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
+                echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
+                eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+                # Install Homebrew's dependancies
+                sudo apt-get install build-essential
+                # Install GCC per Homebrew's suggestion
+                brew install gcc
+            fi
+                #Set Homebrew variable
+                BREW=`which brew`
+            ;;
+        "ZShell")
+            # macOS installation shouldn't be necessary
+            # Linux installation. 
+            if [[ $OSTYPE = linux-gnu ]]; then
+                sudo apt update && sudo apt install zsh -y
+            fi
+            ;;
+        "ZIM")
+            curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+            echo "Installing starship"
+            $BREW install starship
+            eval "$(starship init zsh)"
+            ;;
+        "GIT")
+            # GIT Install
+            if [[ $OSTYPE = darwin* ]]; then
+                $BREW install git
+            elif [[ $OSTYPE = linux-gnu ]]; then
+                sudo apt update && apt install git
+            fi
+            ;;
+        "Github_CLI")
+            $BREW install gh
+            ;;
+        "GPG")
+            if [[ $OSTYPE = darwin* ]]; then
+                $BREW install gpg
+            elif [[ $OSTYPE = linux-gnu* ]]; then
+                sudo apt update
+                sudo apt install gpg -y
+            fi
 
-        #Add the 1Password Apt repository
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
-        sudo tee /etc/apt/sources.list.d/1password.list
+            ;;
+        "Salt")
+            # Salt Installation
+            curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
+            ;;
+        "1Password")
+            if [[ $OSTYPE = linux-gnu* ]]; then
+                #Adding the key for the 1Password Apt repository
+                curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+                sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
 
-        # Add the debsig-verify policy:
-        sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
-        curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
-        sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
-        sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
-        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-        sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
-    
-        #Install 1Password CLI
-        sudo apt update && sudo apt install 1password-cli
-        fi
-    fi
+                #Add the 1Password Apt repository
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+                sudo tee /etc/apt/sources.list.d/1password.list
 
+                # Add the debsig-verify policy:
+                sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+                curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+                sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+                sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+                curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+                sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+
+                #Install 1Password CLI
+                sudo apt update && sudo apt install 1password-cli
+            fi
+            ;;
+        *)
+            # Help
+            echo "No software installation script configured for $1"
+            ;;
+    esac
 }
 
 # Softare to install as an associated array (dictionary). No spaces!
@@ -143,7 +153,6 @@ software["Salt"]="salt-call"
 
 # Check if script has been run before
 check_for_previous_run $1
-
 # Install priority software first
 echo "$(check_for_software "Homebrew" "brew")"
 echo "~~~~"
