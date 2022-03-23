@@ -53,6 +53,9 @@ install_thing () {
         "Homebrew")
             #Homebrew installation
             if [[ $OSTYPE = darwin* ]]; then
+                sudo apt update
+                # Installing apt-utils because ChromeOS is up errors about it missing when I install homebrew. 
+                sudo apt install apt-utils -y
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
                 # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
             # Linux Installation (ChromeOS)
