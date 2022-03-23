@@ -7,7 +7,6 @@
 BOOTSTRAP_INDICATOR=$HOME/.github/.respawn_bootstrap
 RESPAWN_DIRECTORY=$HOME/.config/respawn
 RESPAWN_KEY=$HOME/.ssh/respawn_key
-BREW=`which brew`
 
 # Script Functions
 # ~~~
@@ -28,17 +27,7 @@ check_for_previous_run () {
 #When checking if a variable location is a directory, add the '/'!!!!!
 check_for_software () {
     echo "Checking for $1..."
-    # Check for software by config
-    config_software=("ZIM")
-    if [[ ${config_software[*]} =~ d ]]; then
-        if [[ ! -d $2 ]]; then
-            echo "$1 not detected."
-            echo "Installing $1."
-            echo "~~~~"
-            install_thing $1
-        fi
-    # Check for software by which
-    elif [[ ! -e "$(which $2)" ]]; then
+    if [[ ! -e "$(which $2)" ]]; then
         echo "$1 not detected."
         echo "Installing $1."
         echo "~~~~"
@@ -50,63 +39,7 @@ check_for_software () {
 # ~~~
 install_thing () {
     case "$1" in
-        "Homebrew")
-            #Homebrew installation
-            if [[ $OSTYPE = darwin* ]]; then
-                sudo apt update
-                # Installing apt-utils because ChromeOS is up errors about it missing when I install homebrew. 
-                sudo apt install apt-utils -y
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-                # Needed to add 'CI=a' to this command for passwordless sudo environments like crostini.
-            # Linux Installation (ChromeOS)
-            elif [[ $OSTYPE = linux-gnu* ]]; then
-                CI=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-                # Add Homebrew to the PATH
-                echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.profile
-                echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> $HOME/.zprofile
-                eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-                # Install Homebrew's dependancies
-                sudo apt-get install build-essential
-                # Install GCC per Homebrew's suggestion
-                brew install gcc
-            fi
-                #Set Homebrew variable
-                BREW=`which brew`
-            ;;
-        "ZShell")
-            # macOS installation shouldn't be necessary
-            # Linux installation. 
-            if [[ $OSTYPE = linux-gnu ]]; then
-                sudo apt update && sudo apt install zsh -y
-            fi
-            ;;
-        "ZIM")
-            curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-            echo "Installing starship"
-            $BREW install starship
-            eval "$(starship init zsh)"
-            ;;
-        "GIT")
-            # GIT Install
-            if [[ $OSTYPE = darwin* ]]; then
-                $BREW install git
-            elif [[ $OSTYPE = linux-gnu ]]; then
-                sudo apt update && apt install git
-            fi
-            ;;
-        "Github_CLI")
-            $BREW install gh
-            ;;
-        "GPG")
-            if [[ $OSTYPE = darwin* ]]; then
-                $BREW install gpg
-            elif [[ $OSTYPE = linux-gnu* ]]; then
-                sudo apt update
-                sudo apt install gpg -y
-            fi
-
-            ;;
-        "Salt")
+       "Salt")
             # Salt Installation
             curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
             ;;
@@ -133,38 +66,18 @@ install_thing () {
             fi
             ;;
         *)
-            # Help
+            # Didn't follow instructions...
             echo "No software installation script configured for $1"
             ;;
     esac
 }
 
-# Softare to install as an associated array (dictionary). No spaces!
-# Need to figure out the order. Homebrew should be first.
-declare -A software
-
-# ZSH
-software["ZShell"]="zsh"
-# Git
-software["GIT"]="git"
-# Github CLI
-software["Github_CLI"]="gh"
-# GPG
-software["GPG"]="gpg"
-# Salt
-software["Salt"]="salt-call"
-
 # Check if script has been run before
 check_for_previous_run $1
-# Install priority software first
-echo "$(check_for_software "Homebrew" "brew")"
+
+# Install Git if it's not already installed
+echo "$(check_for_software "Git" "git")"
 echo "~~~~"
-# Loop through software array and install if not already installed
-# For every key in the associative array..
-for s in "${!software[@]}"; do
-    echo "$(check_for_software $s ${software[$s]})"
-    echo "~~~~"
-done
 
 echo "~~~~ "
 # Checking for git file. Skipping if there isn't one
@@ -212,11 +125,6 @@ if [[ ! -d ~/.git ]]; then
 else
     echo "The home directory already has a git file. Skipping git steps."
 fi
-
-# Installing powerline fonts
-echo "---- "
-echo "Installing Powerline Fonts"
-~/.config/respawn/files/fonts/install.sh
 
 # Create/update minion config that points to this dir.
 echo "---- "
