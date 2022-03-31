@@ -21,14 +21,6 @@ function help() {
 # Finding salt installation and setting variable
 SALT=$(which salt-call)
 function sc() {
-    # Temporarily changing default shell so that salt calls in respawn will work. 
-    # TODO: This isn't quite working. Somewhere the space between shell and user is getting removed so it's trying to change to $shell$user instead of just $shell
-    # TODO: Figure out why it doesn't work with fish shell and fix
-    
-    # ORIGINALSHELL=$SHELL
-    # if [[ $SHELL == $FISH ]]; then
-    #         sudo chsh -s $(which bash) $USER
-    # fi
     sudo "$SALT" \
         --config-dir="${RESPAWN_DIR}" \
         $salt_command $state $flag_1 $option_1 \

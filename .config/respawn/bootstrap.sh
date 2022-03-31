@@ -79,7 +79,10 @@ check_for_previous_run $1
 echo "$(check_for_software "Git" "git")"
 echo "~~~~"
 
-echo "~~~~ "
+# Install Salt if it's not already installed
+echo "$(check_for_software "Salt" "salt-call")"
+echo "~~~~"
+
 # Checking for git file. Skipping if there isn't one
 if [[ ! -d ~/.git ]]; then
     # Check for respawn key and get one if it doesn't
