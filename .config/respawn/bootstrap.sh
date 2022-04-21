@@ -103,6 +103,6 @@ chmod +x respawn
 # Touching a file so bootstrap knows it's been run
 echo "---- "
 echo "Creating bootstrap indicator --> $BOOTSTRAP_INDICATOR"
-printf -v date '%(%Y-%m-%d %H:%M:%S)T\n' -1 
+date=$(date)
 echo "respawn bootstrap ran on $date" > $BOOTSTRAP_INDICATOR 
 
