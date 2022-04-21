@@ -40,6 +40,7 @@ install_thing () {
     case "$1" in
        "Salt")
             # Salt Installation
+            echo "Installing Salt. Please provide your root password."
             curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
             ;;
         "Git")
