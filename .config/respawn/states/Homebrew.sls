@@ -1,3 +1,4 @@
+#TODO: set this to only run on linux
 Install Homebrew:
   cmd.script:
     - source: https://raw.githubusercontent.com/Homebrew/install/master/install.sh
