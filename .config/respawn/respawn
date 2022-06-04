@@ -15,23 +15,24 @@ function help() {
         echo "---- "
         echo "-h | --help (This help menu!!!)"
         echo "-g | --go (run the Salt high state)"
-        echo "-s | --salt <state> (runs one state instead of the entire highstate)"
+        echo "-s | --saltcall blah... (runs a salt call with up to 3 arguments)"
 }
 
 # Finding salt installation and setting variable
 SALT=$(which salt-call)
+# Salt call with Pillar data
+function sc_p() {
+    sudo "$SALT" \
+        --config-dir="${RESPAWN_DIR}" \
+        $salt_command $arg_1 $arg_2 $arg_3 \
+        pillar="{'user': '$USER', 'home': '$HOME', 'fish': '$FISH', 'bash': '$BASH', 'zim': '$ZIM_HOME', 'zsh': '$ZSH', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
+}
+# Salt call without Pillar data, because some commands don't like it (i.e. grains)
 function sc() {
     sudo "$SALT" \
         --config-dir="${RESPAWN_DIR}" \
-        $salt_command $state $flag_1 $option_1 \
-        pillar="{'user': '$USER', 'home': '$HOME', 'fish': '$FISH', 'bash': '$BASH', 'zim': '$ZIM_HOME', 'zsh': '$ZSH', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
-
-    # Change default shell back to FISH if it was FISH
-    # if [[ $ORIGINALSHELL != $SHELL ]]; then
-    #     sudo chsh -s $ORIGINALSHELL $USER
-    # fi
+        $salt_command $arg_1 $arg_2 $arg_3
 }
-
 
 case "$1" in
     # Display help to user
@@ -39,20 +40,24 @@ case "$1" in
     help
     ;;
 
-    #Salt states
+    #Salt command
     "-s" | "--salt")
-    salt_command="state.apply"
-    state=$2
-    flag_1=$3
-    option_1=$4
-    sc
+    salt_command=$2
+    arg_1=$3
+    arg_2=$4
+    arg_3=$5
+    if [[ $2 != "grains.items" ]] ; then
+      sc
+    else
+      sc_p
+    fi
     ;;
 
     #Salt highstate
     "-g" | "--go")
     salt_command="state.apply"
-    state=""
-    sc
+    arg_1=""
+    sc_p
 
         if [[ $(echo $SHELL) != $ZSH ]]; then
             $ZSH
