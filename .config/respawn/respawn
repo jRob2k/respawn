@@ -25,7 +25,7 @@ function sc_p() {
     sudo "$SALT" \
         --config-dir="${RESPAWN_DIR}" \
         $salt_command $arg_1 $arg_2 $arg_3 \
-        pillar="{'user': '$USER', 'home': '$HOME', 'fish': '$FISH', 'bash': '$BASH', 'zim': '$ZIM_HOME', 'zsh': '$ZSH', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
+        pillar="{'user': '$USER', 'home': '$HOME', 'bash': '$BASH', 'respawn': '$RESPAWN_DIR/respawn', zim': '$ZIM_HOME', 'zsh': '$ZSH', 'secrets_dir': '$RESPAWN_DIR/secrets'}" 
 }
 # Salt call without Pillar data, because some commands don't like it (i.e. grains)
 function sc() {
@@ -46,7 +46,7 @@ case "$1" in
     arg_1=$3
     arg_2=$4
     arg_3=$5
-    if [[ $2 != "grains.items" ]] ; then
+    if [[ $2 == "grains.items" ]] ; then
       sc
     else
       sc_p
