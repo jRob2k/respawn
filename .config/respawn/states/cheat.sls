@@ -8,3 +8,8 @@ Download cheat:
     - name: curl -fsSL "https://github.com/cheat/cheat/releases/latest/download/cheat-linux-amd64.gz" | gunzip > /opt/cheat/cheat
     {% endif %}
     - creates: /opt/cheat/cheat
+
+Add to PATH:
+  file.symlink:
+    - name: /usr/local/bin/cheat
+    - target: /opt/cheat/cheat
