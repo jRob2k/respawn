@@ -1,8 +1,9 @@
 include:
+  - .cheat
+  - .GH
   - .respawn
   - .spacevim
   - .ZSH
-  - .GH
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock
