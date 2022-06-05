@@ -63,7 +63,19 @@ case "$1" in
             $ZSH
         fi
         ;;
-
+    
+    #Switch to respawn origin to ssh
+    "-S" | "ssh_auth--")
+    git remote set-url origin git@github.com:jRob2k/respawn.git 
+    echo "respawn remote origin updated for SSH auth"
+    ;;
+     
+    #Switch to respawn origin to ssh
+    "-H" | "http_auth--")
+    git remote set-url origin https://github.com/jRob2k/respawn.git 
+    echo "respawn remote origin updated for HTTP auth"
+    ;;
+    
     #Launch help
     *)
     help
