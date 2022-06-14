@@ -11,11 +11,10 @@ Install Homebrew:
 Add Homebrew to Path:
   cmd.run:
     - runas: {{ pillar['user'] }}
-    - shell: {{ pillar['bash'] }}
     - names:
-    # - test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
+      - test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
       - test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    # - test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile
-      - echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
-    - unless: which brew
+      - test -r ~/.zshenv && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.zshenv
+      - echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.zshrc
+      - unless: which brew
 {% endif %}   
