@@ -1,6 +1,11 @@
 Create cheat dir:
   file.directory:
     - name: /opt/cheat
+    - dir_mode: 755
+    - file_mode: 755
+    - recurse:
+      - user
+      - mode
 
 Download cheat:
   cmd.run:
