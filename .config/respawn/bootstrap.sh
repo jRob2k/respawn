@@ -86,6 +86,15 @@ else
     echo "The home directory already has a git file. Skipping git steps."
 fi
 
+# Installing Powerline fonts if they aren't already 
+FONTDIR=$HOME/.local/share/fonts
+if [ $(ls $FONTDIR/*Powerline* 2>/dev/null | wc -l) -gt 0 ]; then 
+  echo "Powerline fonts already installed"
+else
+  echo "Powerline fonts not found in $FONTDIR. Installing..."
+  $RESPAWN_DIRECTORY/files/fonts/install.sh
+fi
+
 # Create/update minion config that points to this dir.
 echo "---- "
 echo "Updating the minion config to point to $RESPAWN_DIRECTORY"
