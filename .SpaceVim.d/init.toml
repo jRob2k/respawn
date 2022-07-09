@@ -24,6 +24,7 @@
     enable_tabline_filetype_icon = true
     enable_statusline_mode = false
     relativenumber = false
+    bootstrap_after = "myspacevim#after"
 
 # Enable autocomplete layer
 [[layers]]
@@ -50,3 +51,5 @@
 # Enable language support
 [[layers]]
   name = "lang#python"
+
+
