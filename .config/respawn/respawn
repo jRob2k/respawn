@@ -16,6 +16,8 @@ function help() {
         echo "-h | --help (This help menu!!!)"
         echo "-g | --go (run the Salt high state)"
         echo "-s | --saltcall blah... (runs a salt call with up to 3 arguments)"
+        echo "-S | This switches respawn origin to ssh. Use this when you have an SSH key for respawn"
+        echo "-H | This switches respawn origin to HTTPS. Use this if you only have a passcode"
 }
 
 # Finding salt installation and setting variable
