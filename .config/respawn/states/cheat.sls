@@ -1,3 +1,5 @@
+Install Nano:
+  
 Create cheat dir:
   file.directory:
     - name: /opt/cheat
