@@ -11,4 +11,6 @@ include:
   - .Homebrew
   - .auth_stuff
   - .python3
+  - .snap_store
+  - .flatpak
   {% endif %}
