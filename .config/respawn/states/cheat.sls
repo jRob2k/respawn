@@ -1,5 +1,3 @@
-Install Nano:
-  
 Create cheat dir:
   file.directory:
     - name: /opt/cheat
@@ -25,3 +23,4 @@ Add to PATH:
     - name: /usr/local/bin/cheat
     - target: /opt/cheat/cheat
 {% endif %}
+
