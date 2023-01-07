@@ -1,4 +1,5 @@
-Install vscode:
+Install_vscode:
   pkg.installed:
     - sources:
-      - vscode: https://go.microsoft.com/fwlink/?LinkID=760868
+      - code: http://go.microsoft.com/fwlink/?LinkID=760868
+    - allow_updates: True
