@@ -4,6 +4,7 @@ include:
   - .respawn
   - .spacevim
   - .ZSH
+  - .vscode
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock
