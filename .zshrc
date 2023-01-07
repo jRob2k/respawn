@@ -148,3 +148,5 @@ eval "$(starship init zsh)"
 alias saltdev="sudo /opt/salt/bin/salt-call --config-dir=/etc/salt-dev"
 
 alias respawn='/usr/bin/zsh /home/jrob2k/.config/respawn/respawn'
+alias respawn=' /home/jrob2k/.config/respawn/respawn'
+eval "$(/bin/brew shellenv)"
