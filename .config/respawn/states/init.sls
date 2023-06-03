@@ -13,4 +13,5 @@ include:
   - .python3
   - .snap_store
   - .flatpak
+  - .vim
   {% endif %}
