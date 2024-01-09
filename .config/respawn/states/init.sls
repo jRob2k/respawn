@@ -3,12 +3,12 @@ include:
   - .GH
   - .respawn
   - .ZSH
-  - .vscode
+ #  - .vscode
   {% if grains['os'] == 'MacOS' %}
   - .defaults
   - .dock
   {% elif grains['os_family'] == 'Debian' %}
-  - .Homebrew
+ #  - .Homebrew
   - .auth_stuff
   - .python3
   - .snap_store
