@@ -41,7 +41,7 @@ install_thing () {
        "Salt")
             # Salt Installation
             echo "Installing Salt. Please provide your root password."
-            curl -o bootstrap-salt.sh -L https://bootstrap.saltproject.io && sudo sh bootstrap-salt.sh
+            curl -o bootstrap-salt.sh -L https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh && sudo sh bootstrap-salt.sh
             ;;
         "Git")
             # Git Installation
