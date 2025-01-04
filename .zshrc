@@ -146,4 +146,4 @@ eval "$(starship init zsh)"
 
 
 alias respawn='/usr/bin/zsh /home/jrob2k/.config/respawn/respawn'
-alias respawn=' /home/jrob2k/.config/respawn/respawn'
+alias respawn=${HOME}'/.config/respawn/respawn'
